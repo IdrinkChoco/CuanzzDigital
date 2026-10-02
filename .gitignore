@@ -1,0 +1,30 @@
+# System / OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.sublime-*
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build output (sesuaikan — kamu punya folder Release/)
+Release/
+dist/
+build/
+
+# Env & secret
+.env
+.env.local
+*.key
+*.pem
+
+# Logs
+*.log
+logs/
