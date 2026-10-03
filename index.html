@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <!-- TAB NAVIGATION BAR (4 TABS) -->
+    <!-- TAB NAVIGATION BAR -->
     <div class="max-w-6xl mx-auto px-4 flex border-t border-slate-100 overflow-x-auto">
       <button id="btn-tab-dashboard" onclick="switchTab('dashboard')" class="tab-button tab-active flex items-center space-x-2 py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700 text-sm font-medium transition-all whitespace-nowrap">
         <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
@@ -197,6 +197,15 @@
             </div>
           </div>
 
+          <!-- SUMBER AKUN / REKENING (INTEGRASI ASET) -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Sumber Akun / Rekening (Aset atau Utang)</label>
+            <select id="tx-account" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="">-- Memuat Rekening... --</option>
+            </select>
+            <p class="text-[11px] text-slate-400 mt-1">Pilih akun ini agar saldo Aset/Liabilitasmu otomatis ter-update.</p>
+          </div>
+
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Judul / Keterangan Singkat</label>
             <input id="tx-title" type="text" placeholder="Contoh: Honor Freelance / Makan Siang" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -234,10 +243,8 @@
       </div>
     </section>
 
-    <!-- TAB 3: TAB IURAN BULANAN (BARU) -->
+    <!-- TAB 3: TAB IURAN BULANAN -->
     <section id="tab-bills" class="hidden space-y-6">
-      
-      <!-- FORM SETTING MASTER IURAN -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl mx-auto space-y-4">
         <div>
           <h2 class="text-lg font-bold text-slate-900">Atur Master Iuran / Tagihan Rutin</h2>
@@ -278,7 +285,6 @@
         </form>
       </div>
 
-      <!-- NOTICE CARD SUMMARY -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
           <div>
@@ -292,18 +298,15 @@
           </div>
         </div>
 
-        <!-- LIST DAFTAR NOTICE TAGIHAN -->
         <div id="bill-notice-list" class="space-y-3">
         </div>
       </div>
 
-      <!-- MASTER TAGIHAN REGISTERED -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3">
         <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Daftar Master Iuran Terdaftar</h4>
         <div id="bill-master-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
         </div>
       </div>
-
     </section>
 
     <!-- TAB 4: TAB ASET & LIABILITAS -->

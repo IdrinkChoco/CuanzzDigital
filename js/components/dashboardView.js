@@ -29,6 +29,8 @@ export async function renderDashboard(startDate, endDate) {
         .map(tt => `<span class="inline-block bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded mr-1">#${tt.tags.name}</span>`)
         .join('');
 
+      const accountName = tx.assets_liabilities ? tx.assets_liabilities.name : 'Umum';
+
       const isIncome = tx.type === 'income';
       const row = document.createElement('tr');
       row.className = 'hover:bg-slate-50/80 transition-colors';
@@ -36,7 +38,7 @@ export async function renderDashboard(startDate, endDate) {
         <td class="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">${formatDate(tx.transaction_date)}</td>
         <td class="py-3 px-4">
           <div class="font-medium text-slate-900">${tx.title}</div>
-          <div class="text-xs text-slate-400">${tx.note || '-'}</div>
+          <div class="text-xs text-slate-400">Sumber: ${accountName} ${tx.note ? '• ' + tx.note : ''}</div>
         </td>
         <td class="py-3 px-4">
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isIncome ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'} border">
@@ -54,9 +56,8 @@ export async function renderDashboard(startDate, endDate) {
         </td>
       `;
 
-      // Event Listener Hapus Transaksi
       row.querySelector('.btn-delete-tx').addEventListener('click', async () => {
-        if (confirm(`Hapus transaksi "${tx.title}"?`)) {
+        if (confirm(`Hapus transaksi "${tx.title}"? (Saldo akun terkait akan dikembalikan)`)) {
           await transactionService.deleteTransaction(tx.id);
           renderDashboard(startDate, endDate);
         }
