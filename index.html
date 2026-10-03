@@ -185,7 +185,6 @@
             </div>
           </div>
 
-          <!-- OPTION INTEGRASI PEMBAYARAN IURAN BULANAN (KHUSUS EXPENSE) -->
           <div id="section-pay-bill" class="p-3 bg-amber-50 rounded-lg border border-amber-200 space-y-2">
             <label class="flex items-center text-xs font-bold text-amber-900 cursor-pointer">
               <input type="checkbox" id="chk-is-bill" class="mr-2 rounded text-blue-600 w-4 h-4">
@@ -196,7 +195,6 @@
               <select id="tx-bill-select" class="w-full border border-amber-300 rounded-lg p-2 text-xs text-slate-800 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
                 <option value="">-- Pilih Iuran Yang Dibayar --</option>
               </select>
-              <p class="text-[11px] text-amber-700 mt-1">Sistem akan otomatis mengisi nominal, judul, & kategori iuran.</p>
             </div>
           </div>
 
@@ -322,78 +320,116 @@
       </div>
     </section>
 
-    <!-- TAB 4: TAB ASET & LIABILITAS -->
+    <!-- TAB 4: TAB ASET & LIABILITAS (+ FORM TRANSFER) -->
     <section id="tab-assets" class="hidden space-y-6">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl mx-auto space-y-5">
-        <div>
-          <h2 class="text-lg font-bold text-slate-900">Input Aset & Liabilitas Baru</h2>
-          <p class="text-xs text-slate-500">Catat harta kekayaan atau kewajiban utangmu secara rapi.</p>
-        </div>
-
-        <form id="form-asset" onsubmit="event.preventDefault();" class="space-y-4">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        
+        <!-- FORM 1: INPUT ASET / LIABILITAS BARU -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-2">Jenis Kepemilikan</label>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="relative flex items-center justify-center p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer text-emerald-700 font-semibold text-sm transition-all">
-                <input type="radio" name="asset_type" value="asset" checked class="sr-only">
-                <i data-lucide="shield-check" class="w-4 h-4 mr-2"></i>
-                <span>Aset (Harta)</span>
-              </label>
-
-              <label class="relative flex items-center justify-center p-3 rounded-lg border-2 border-slate-200 hover:border-slate-300 bg-white cursor-pointer text-slate-600 font-medium text-sm transition-all">
-                <input type="radio" name="asset_type" value="liability" class="sr-only">
-                <i data-lucide="credit-card" class="w-4 h-4 mr-2"></i>
-                <span>Liabilitas (Utang/Kewajiban)</span>
-              </label>
-            </div>
+            <h2 class="text-base font-bold text-slate-900">Input Aset / Liabilitas</h2>
+            <p class="text-xs text-slate-500">Daftarkan akun rekening atau utang baru.</p>
           </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Aset / Liabilitas</label>
-            <input id="asset-name" type="text" placeholder="Contoh: Tabungan BCA / KPR Rumah / Emas" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <form id="form-asset" onsubmit="event.preventDefault();" class="space-y-3">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori</label>
-              <select id="asset-category" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <div class="grid grid-cols-2 gap-2">
+                <label class="relative flex items-center justify-center p-2 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer text-emerald-700 font-semibold text-xs">
+                  <input type="radio" name="asset_type" value="asset" checked class="sr-only">
+                  <span>Aset (Harta)</span>
+                </label>
+
+                <label class="relative flex items-center justify-center p-2 rounded-lg border-2 border-slate-200 bg-white cursor-pointer text-slate-600 font-medium text-xs">
+                  <input type="radio" name="asset_type" value="liability" class="sr-only">
+                  <span>Liabilitas (Utang)</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <input id="asset-name" type="text" placeholder="Nama: BCA / Gopay / KPR" required class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <select id="asset-category" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <option value="Kas & Rekening">Kas & Bank</option>
-                <option value="Investasi">Investasi & Saham/Crypto</option>
-                <option value="Properti">Properti & Tanah</option>
+                <option value="Investasi">Investasi/Saham</option>
+                <option value="Properti">Properti</option>
                 <option value="Kendaraan">Kendaraan</option>
-                <option value="Utang Bank/KPR">Utang Bank / KPR / Pinjol</option>
+                <option value="Utang Bank/KPR">Utang Bank/KPR</option>
                 <option value="Kartu Kredit">Kartu Kredit</option>
-                <option value="Lainnya">Lainnya</option>
               </select>
-            </div>
 
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Uang</label>
-              <select id="asset-currency" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <select id="asset-currency" class="w-full border border-slate-300 rounded-lg p-2 text-xs font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <option value="IDR">IDR (Rp)</option>
                 <option value="USD">USD ($)</option>
-                <option value="SGD">SGD ($)</option>
               </select>
             </div>
-          </div>
 
+            <div>
+              <input id="asset-amount" type="number" placeholder="Nominal Awal" required class="w-full border border-slate-300 rounded-lg p-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div>
+              <input id="asset-note" type="text" placeholder="Catatan (Opsional)" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center space-x-1">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>Simpan Akun</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- FORM 2: TRANSFER ANTAR AKUN / REKENING (BARU) -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Nilai / Nominal</label>
-            <input id="asset-amount" type="number" placeholder="0" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm font-semibold text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <h2 class="text-base font-bold text-slate-900">Transfer Antar Akun</h2>
+            <p class="text-xs text-slate-500">Pindah saldo (misal: Bank ➔ Gopay) tanpa ganggu Cashflow.</p>
           </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
-            <input id="asset-note" type="text" placeholder="Contoh: Jatuh tempo tgl 20 / Rekening utama" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
+          <form id="form-transfer" onsubmit="event.preventDefault();" class="space-y-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Dari Akun (Asal)</label>
+              <select id="tf-from-account" required class="w-full border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="">-- Pilih Akun Asal --</option>
+              </select>
+            </div>
 
-          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-all flex items-center justify-center space-x-2">
-            <i data-lucide="plus-circle" class="w-5 h-5"></i>
-            <span>Simpan Aset / Liabilitas</span>
-          </button>
-        </form>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Ke Akun (Tujuan)</label>
+              <select id="tf-to-account" required class="w-full border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="">-- Pilih Akun Tujuan --</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nominal (Rp)</label>
+                <input id="tf-amount" type="number" placeholder="0" required class="w-full border border-slate-300 rounded-lg p-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tanggal</label>
+                <input id="tf-date" type="date" required class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <input id="tf-note" type="text" placeholder="Catatan (Tarik tunai / Top up Gopay)" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center space-x-1">
+              <i data-lucide="arrow-right-left" class="w-4 h-4"></i>
+              <span>Proses Transfer Saldo</span>
+            </button>
+          </form>
+        </div>
+
       </div>
 
+      <!-- RINGKASAN NET WORTH & RIWAYAT TRANSFER -->
       <div class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -412,7 +448,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
               <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i>
@@ -428,6 +464,16 @@
               <h3 class="font-bold text-slate-800 text-base">Daftar Liabilitas / Utang</h3>
             </div>
             <div id="liability-list" class="space-y-2">
+            </div>
+          </div>
+
+          <!-- RIWAYAT TRANSFER ANTAR AKUN -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+              <i data-lucide="arrow-right-left" class="w-5 h-5 text-blue-600"></i>
+              <h3 class="font-bold text-slate-800 text-base">Riwayat Transfer</h3>
+            </div>
+            <div id="transfer-history-list" class="space-y-2">
             </div>
           </div>
         </div>
