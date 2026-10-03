@@ -2,6 +2,7 @@ import { billService } from '../services/billService.js';
 import { transactionService } from '../services/transactionService.js';
 import { formatCurrency } from '../utils/formatters.js';
 
+// 1. EXPORT FUNGSI RENDER BILLS
 export async function renderBills() {
   const billNoticeEl = document.getElementById('bill-notice-list');
   const billMasterEl = document.getElementById('bill-master-list');
@@ -10,7 +11,7 @@ export async function renderBills() {
 
   if (!billNoticeEl || !billMasterEl) return;
 
-  const currentPeriod = new Date().toISOString().slice(0, 7); // "2026-08"
+  const currentPeriod = new Date().toISOString().slice(0, 7); // Format: "YYYY-MM"
 
   try {
     const logs = await billService.syncMonthlyBills(currentPeriod);
@@ -22,8 +23,7 @@ export async function renderBills() {
     billNoticeEl.innerHTML = '';
     billMasterEl.innerHTML = '';
 
-    // Render Notice Tagihan Bulan Ini
-    if (logs.length === 0) {
+    if (!logs || logs.length === 0) {
       billNoticeEl.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">Belum ada tagihan bulanan terdaftar.</p>`;
     } else {
       logs.forEach(log => {
@@ -34,8 +34,7 @@ export async function renderBills() {
       });
     }
 
-    // Render Master Tagihan List
-    if (masters.length === 0) {
+    if (!masters || masters.length === 0) {
       billMasterEl.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">Belum ada master tagihan.</p>`;
     } else {
       masters.forEach(m => {
@@ -50,13 +49,14 @@ export async function renderBills() {
 
   } catch (err) {
     console.error('Gagal memuat tagihan:', err);
+    billNoticeEl.innerHTML = `<p class="text-xs text-rose-500 py-3 text-center">Terjadi kesalahan memuat data iuran.</p>`;
   }
 }
 
 function createBillNoticeCard(log) {
   const div = document.createElement('div');
   const isPaid = log.status === 'paid';
-  const bill = log.recurring_bills;
+  const bill = log.recurring_bills || {};
 
   div.className = `flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-lg border ${isPaid ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/50 border-amber-200'} transition-all gap-3`;
 
@@ -66,8 +66,8 @@ function createBillNoticeCard(log) {
         <i data-lucide="${isPaid ? 'check-circle-2' : 'clock'}" class="w-5 h-5"></i>
       </div>
       <div>
-        <div class="font-bold text-slate-800 text-sm">${bill.name}</div>
-        <div class="text-xs text-slate-500">Jatuh Tempo: Tgl ${bill.due_day} • Kategori: ${bill.categories?.name || 'Umum'}</div>
+        <div class="font-bold text-slate-800 text-sm">${bill.name || 'Iuran'}</div>
+        <div class="text-xs text-slate-500">Jatuh Tempo: Tgl ${bill.due_day || '-'} • Kategori: ${bill.categories?.name || 'Umum'}</div>
       </div>
     </div>
 
@@ -129,6 +129,7 @@ function createBillMasterCard(master) {
   return div;
 }
 
+// 2. EXPORT FUNGSI SETUP BILL FORM
 export function setupBillForm() {
   const form = document.getElementById('form-bill');
   if (!form) return;
@@ -162,12 +163,16 @@ export function setupBillForm() {
 async function loadCategoriesSelect() {
   const sel = document.getElementById('bill-category');
   if (!sel) return;
-  const categories = await transactionService.getCategories('expense');
-  sel.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-  categories.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.id;
-    opt.textContent = c.name;
-    sel.appendChild(opt);
-  });
+  try {
+    const categories = await transactionService.getCategories('expense');
+    sel.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+    categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+  } catch (e) {
+    console.error('Gagal memuat kategori iuran:', e);
+  }
 }

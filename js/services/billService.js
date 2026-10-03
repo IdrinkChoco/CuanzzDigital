@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabase.js';
 
 export const billService = {
-  // Ambil semua master tagihan
+  // 1. Ambil semua master tagihan
   async getBills() {
     const { data, error } = await supabase
       .from('recurring_bills')
@@ -11,7 +11,7 @@ export const billService = {
     return data || [];
   },
 
-  // Buat Master Tagihan Baru
+  // 2. Buat Master Tagihan Baru
   async createBill(billData) {
     const { data, error } = await supabase
       .from('recurring_bills')
@@ -22,18 +22,17 @@ export const billService = {
     return data;
   },
 
-  // Hapus Master Tagihan
+  // 3. Hapus Master Tagihan
   async deleteBill(id) {
     const { error } = await supabase.from('recurring_bills').delete().eq('id', id);
     if (error) throw error;
   },
 
-  // Generate / Sync Tagihan Bulan Ini
-  async syncMonthlyBills(periodMonth) { // periodMonth ex: "2026-08"
+  // 4. Sync Log Tagihan Bulan Ini
+  async syncMonthlyBills(periodMonth) {
     const bills = await this.getBills();
     if (bills.length === 0) return [];
 
-    // Ambil log yang sudah ada di bulan ini
     const { data: existingLogs } = await supabase
       .from('bill_logs')
       .select('*')
@@ -42,7 +41,6 @@ export const billService = {
     const existingBillIds = (existingLogs || []).map(l => l.bill_id);
     const newLogs = [];
 
-    // Jika ada master tagihan yang belum masuk log bulan ini, buatkan log-nya
     for (const bill of bills) {
       if (!existingBillIds.includes(bill.id)) {
         newLogs.push({
@@ -59,7 +57,6 @@ export const billService = {
       await supabase.from('bill_logs').insert(newLogs);
     }
 
-    // Ambil ulang data log lengkap gabung dengan master
     const { data: currentLogs, error } = await supabase
       .from('bill_logs')
       .select('*, recurring_bills(*, categories(name))')
@@ -69,12 +66,40 @@ export const billService = {
     return currentLogs || [];
   },
 
-  // Update Status Tagihan (Paid / Pending) & Opsional Masuk ke Cashflow
+  // 5. Ambil daftar iuran pending bulan ini (DIBUTUHKAN OLEH transactionForm.js)
+  async getPendingBillsThisMonth() {
+    const currentPeriod = new Date().toISOString().slice(0, 7);
+    await this.syncMonthlyBills(currentPeriod); // Pastikan log ter-sync
+
+    const { data, error } = await supabase
+      .from('bill_logs')
+      .select('*, recurring_bills(*, categories(name))')
+      .eq('period_month', currentPeriod)
+      .eq('status', 'pending');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // 6. Tandai Iuran Terbayar dari Transaksi (DIBUTUHKAN OLEH transactionForm.js)
+  async markBillAsPaidByTransaction(billLogId, transactionId) {
+    const { error } = await supabase
+      .from('bill_logs')
+      .update({
+        status: 'paid',
+        is_cashflow_added: true,
+        transaction_id: transactionId
+      })
+      .eq('id', billLogId);
+
+    if (error) throw error;
+  },
+
+  // 7. Toggle Manual Status di Tab Iuran
   async toggleBillPaidStatus(log, shouldAddToCashflow = true) {
     const newStatus = log.status === 'pending' ? 'paid' : 'pending';
     let txId = log.transaction_id;
 
-    // Jika diubah jadi PAID dan user minta masuk cashflow
     if (newStatus === 'paid' && shouldAddToCashflow && !log.is_cashflow_added) {
       const today = new Date().toISOString().split('T')[0];
       const { data: newTx, error: txErr } = await supabase
@@ -90,12 +115,9 @@ export const billService = {
         .select()
         .single();
 
-      if (!txErr) {
-        txId = newTx.id;
-      }
+      if (!txErr) txId = newTx.id;
     }
 
-    // Update status log
     const { error } = await supabase
       .from('bill_logs')
       .update({

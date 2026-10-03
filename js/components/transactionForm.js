@@ -1,5 +1,6 @@
 import { transactionService } from '../services/transactionService.js';
 import { assetService } from '../services/assetService.js';
+import { billService } from '../services/billService.js';
 import { supabase } from '../config/supabase.js';
 
 export function setupTransactionForm(onSuccessCallback) {
@@ -15,6 +16,7 @@ export function setupTransactionForm(onSuccessCallback) {
   loadAccountsSelect();
   setupTypeToggle();
   setupCategoryModal();
+  setupBillIntegration(); // Inisialisasi Integrasi Iuran
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -32,6 +34,7 @@ export function setupTransactionForm(onSuccessCallback) {
       const accountEl = document.getElementById('tx-account');
       const tagsEl = document.getElementById('tx-tags');
       const dateEl = document.getElementById('tx-date');
+      const billSelectEl = document.getElementById('tx-bill-select');
 
       const type = typeEl ? typeEl.value : 'expense';
       const currency = currencyEl ? currencyEl.value : 'IDR';
@@ -53,16 +56,23 @@ export function setupTransactionForm(onSuccessCallback) {
         amount,
         title,
         category_id: categoryId,
-        account_id: accountId, // Relasi ke Aset/Liabilitas
+        account_id: accountId,
         transaction_date: date
       };
 
-      await transactionService.createTransaction(newTxData, tagsArray);
+      // 1. Simpan Transaksi utama
+      const createdTx = await transactionService.createTransaction(newTxData, tagsArray);
+
+      // 2. Jika transaksi ini untuk bayar iuran, tandai iuran sebagai TERBAYAR (PAID)
+      if (type === 'expense' && billSelectEl && billSelectEl.value) {
+        await billService.markBillAsPaidByTransaction(billSelectEl.value, createdTx.id);
+      }
 
       form.reset();
       if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+      document.getElementById('wrapper-bill-select')?.classList.add('hidden');
 
-      alert('Transaksi berhasil disimpan & saldo aset otomatis diperbarui!');
+      alert('Transaksi berhasil disimpan!');
       if (onSuccessCallback) onSuccessCallback();
 
     } catch (err) {
@@ -75,7 +85,67 @@ export function setupTransactionForm(onSuccessCallback) {
   });
 }
 
-// Load Dropdown Akun Aset / Liabilitas
+// Logika Checkbox & Dropdown Pembayaran Iuran
+function setupBillIntegration() {
+  const chkIsBill = document.getElementById('chk-is-bill');
+  const wrapperBillSelect = document.getElementById('wrapper-bill-select');
+  const billSelect = document.getElementById('tx-bill-select');
+
+  if (!chkIsBill || !wrapperBillSelect) return;
+
+  chkIsBill.addEventListener('change', async () => {
+    if (chkIsBill.checked) {
+      wrapperBillSelect.classList.remove('hidden');
+      await loadPendingBillsDropdown();
+    } else {
+      wrapperBillSelect.classList.add('hidden');
+      if (billSelect) billSelect.value = '';
+    }
+  });
+
+  // Saat Iuran dipilih, isi otomatis nominal, judul, & kategori
+  billSelect?.addEventListener('change', () => {
+    const selectedOption = billSelect.options[billSelect.selectedIndex];
+    if (!selectedOption || !selectedOption.value) return;
+
+    const amount = selectedOption.getAttribute('data-amount');
+    const title = selectedOption.getAttribute('data-title');
+    const categoryId = selectedOption.getAttribute('data-category');
+
+    if (amount) document.getElementById('tx-amount').value = amount;
+    if (title) document.getElementById('tx-title').value = `[Iuran] ${title}`;
+    if (categoryId) document.getElementById('tx-category').value = categoryId;
+  });
+}
+
+async function loadPendingBillsDropdown() {
+  const billSelect = document.getElementById('tx-bill-select');
+  if (!billSelect) return;
+
+  try {
+    const pendingBills = await billService.getPendingBillsThisMonth();
+    billSelect.innerHTML = '<option value="">-- Pilih Iuran Yang Dibayar --</option>';
+
+    if (pendingBills.length === 0) {
+      billSelect.innerHTML = '<option value="">Semua iuran bulan ini sudah lunas!</option>';
+      return;
+    }
+
+    pendingBills.forEach(log => {
+      const b = log.recurring_bills;
+      const opt = document.createElement('option');
+      opt.value = log.id;
+      opt.textContent = `${b.name} (Rp ${Number(log.amount).toLocaleString('id-ID')}) - Tgl ${b.due_day}`;
+      opt.setAttribute('data-amount', log.amount);
+      opt.setAttribute('data-title', b.name);
+      opt.setAttribute('data-category', b.category_id || '');
+      billSelect.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Gagal memuat iuran pending:', err);
+  }
+}
+
 async function loadAccountsSelect() {
   const accountSelect = document.getElementById('tx-account');
   if (!accountSelect) return;
@@ -151,6 +221,8 @@ async function loadCategories(selectedId = null) {
 
 function setupTypeToggle() {
   const radioButtons = document.querySelectorAll('input[name="transaction_type"]');
+  const billSection = document.getElementById('section-pay-bill');
+
   radioButtons.forEach(radio => {
     radio.addEventListener('change', () => {
       radioButtons.forEach(r => {
@@ -158,8 +230,12 @@ function setupTypeToggle() {
         if (r.checked) {
           if (r.value === 'income') {
             parentLabel.className = 'relative flex items-center justify-center p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer text-emerald-700 font-semibold text-sm transition-all';
+            // Sembunyikan opsi iuran jika tipe Pemasukan
+            if (billSection) billSection.classList.add('hidden');
           } else {
             parentLabel.className = 'relative flex items-center justify-center p-3 rounded-lg border-2 border-rose-500 bg-rose-50/50 cursor-pointer text-rose-700 font-semibold text-sm transition-all';
+            // Tampilkan opsi iuran jika tipe Pengeluaran
+            if (billSection) billSection.classList.remove('hidden');
           }
         } else {
           parentLabel.className = 'relative flex items-center justify-center p-3 rounded-lg border-2 border-slate-200 hover:border-slate-300 bg-white cursor-pointer text-slate-600 font-medium text-sm transition-all';
