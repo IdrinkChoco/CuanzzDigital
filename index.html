@@ -7,6 +7,8 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
     .tab-active {
@@ -75,6 +77,8 @@
 
     <!-- TAB 1: DASHBOARD CONTAINER -->
     <section id="tab-dashboard" class="space-y-6">
+      
+      <!-- FILTER PERIODE -->
       <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
         <div class="flex items-center space-x-2">
           <i data-lucide="calendar" class="w-5 h-5 text-blue-600"></i>
@@ -103,6 +107,7 @@
         </div>
       </div>
 
+      <!-- SUMMARY CARDS -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start justify-between">
           <div>
@@ -135,6 +140,34 @@
         </div>
       </div>
 
+      <!-- VISUALISASI GRAFIK ANALYTICS (BARU) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- CHART 1: DONUT CHART (PENGELUARAN PER KATEGORI) -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm md:col-span-1 flex flex-col justify-between">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+            <h3 class="font-bold text-slate-800 text-sm">Pengeluaran per Kategori</h3>
+            <i data-lucide="pie-chart" class="w-4 h-4 text-slate-400"></i>
+          </div>
+          <div class="relative w-full h-56 flex items-center justify-center">
+            <canvas id="chart-category"></canvas>
+          </div>
+        </div>
+
+        <!-- CHART 2: BAR CHART (CASHFLOW TREN 6 BULAN TERAKHIR) -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm md:col-span-2 flex flex-col justify-between">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+            <h3 class="font-bold text-slate-800 text-sm">Tren Cashflow 6 Bulan Terakhir</h3>
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-slate-400"></i>
+          </div>
+          <div class="relative w-full h-56">
+            <canvas id="chart-cashflow-trend"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TABLE TRANSAKSI -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="p-4 border-b border-slate-100 flex items-center justify-between">
           <h3 class="font-bold text-slate-800 text-base">Rincian Catatan Transaksi</h3>
@@ -320,12 +353,11 @@
       </div>
     </section>
 
-    <!-- TAB 4: TAB ASET & LIABILITAS (+ FORM TRANSFER) -->
+    <!-- TAB 4: TAB ASET & LIABILITAS -->
     <section id="tab-assets" class="hidden space-y-6">
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         
-        <!-- FORM 1: INPUT ASET / LIABILITAS BARU -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
           <div>
             <h2 class="text-base font-bold text-slate-900">Input Aset / Liabilitas</h2>
@@ -382,7 +414,6 @@
           </form>
         </div>
 
-        <!-- FORM 2: TRANSFER ANTAR AKUN / REKENING (BARU) -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
           <div>
             <h2 class="text-base font-bold text-slate-900">Transfer Antar Akun</h2>
@@ -429,7 +460,6 @@
 
       </div>
 
-      <!-- RINGKASAN NET WORTH & RIWAYAT TRANSFER -->
       <div class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -467,7 +497,6 @@
             </div>
           </div>
 
-          <!-- RIWAYAT TRANSFER ANTAR AKUN -->
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
               <i data-lucide="arrow-right-left" class="w-5 h-5 text-blue-600"></i>
