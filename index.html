@@ -7,7 +7,6 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
@@ -69,6 +68,12 @@
         <i data-lucide="building-2" class="w-4 h-4"></i>
         <span>Aset & Liabilitas</span>
       </button>
+
+      <!-- TAB BARU: BUDGET & GOALS -->
+      <button id="btn-tab-goals" onclick="switchTab('goals')" class="tab-button flex items-center space-x-2 py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700 text-sm font-medium transition-all whitespace-nowrap">
+        <i data-lucide="target" class="w-4 h-4"></i>
+        <span>Budget & Goals</span>
+      </button>
     </div>
   </header>
 
@@ -78,7 +83,6 @@
     <!-- TAB 1: DASHBOARD CONTAINER -->
     <section id="tab-dashboard" class="space-y-6">
       
-      <!-- FILTER PERIODE -->
       <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
         <div class="flex items-center space-x-2">
           <i data-lucide="calendar" class="w-5 h-5 text-blue-600"></i>
@@ -107,7 +111,6 @@
         </div>
       </div>
 
-      <!-- SUMMARY CARDS -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start justify-between">
           <div>
@@ -140,10 +143,7 @@
         </div>
       </div>
 
-      <!-- VISUALISASI GRAFIK ANALYTICS (BARU) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <!-- CHART 1: DONUT CHART (PENGELUARAN PER KATEGORI) -->
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm md:col-span-1 flex flex-col justify-between">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
             <h3 class="font-bold text-slate-800 text-sm">Pengeluaran per Kategori</h3>
@@ -154,7 +154,6 @@
           </div>
         </div>
 
-        <!-- CHART 2: BAR CHART (CASHFLOW TREN 6 BULAN TERAKHIR) -->
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm md:col-span-2 flex flex-col justify-between">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
             <h3 class="font-bold text-slate-800 text-sm">Tren Cashflow 6 Bulan Terakhir</h3>
@@ -164,10 +163,8 @@
             <canvas id="chart-cashflow-trend"></canvas>
           </div>
         </div>
-
       </div>
 
-      <!-- TABLE TRANSAKSI -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="p-4 border-b border-slate-100 flex items-center justify-between">
           <h3 class="font-bold text-slate-800 text-base">Rincian Catatan Transaksi</h3>
@@ -355,9 +352,7 @@
 
     <!-- TAB 4: TAB ASET & LIABILITAS -->
     <section id="tab-assets" class="hidden space-y-6">
-      
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
           <div>
             <h2 class="text-base font-bold text-slate-900">Input Aset / Liabilitas</h2>
@@ -457,7 +452,6 @@
             </button>
           </form>
         </div>
-
       </div>
 
       <div class="space-y-6">
@@ -484,8 +478,7 @@
               <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i>
               <h3 class="font-bold text-slate-800 text-base">Daftar Aset</h3>
             </div>
-            <div id="asset-list" class="space-y-2">
-            </div>
+            <div id="asset-list" class="space-y-2"></div>
           </div>
 
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
@@ -493,8 +486,7 @@
               <i data-lucide="credit-card" class="w-5 h-5 text-rose-600"></i>
               <h3 class="font-bold text-slate-800 text-base">Daftar Liabilitas / Utang</h3>
             </div>
-            <div id="liability-list" class="space-y-2">
-            </div>
+            <div id="liability-list" class="space-y-2"></div>
           </div>
 
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
@@ -502,10 +494,85 @@
               <i data-lucide="arrow-right-left" class="w-5 h-5 text-blue-600"></i>
               <h3 class="font-bold text-slate-800 text-base">Riwayat Transfer</h3>
             </div>
-            <div id="transfer-history-list" class="space-y-2">
-            </div>
+            <div id="transfer-history-list" class="space-y-2"></div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: TAB BUDGET & GOALS (BARU) -->
+    <section id="tab-goals" class="hidden space-y-6">
+      
+      <!-- INDICATOR DANA DARURAT BANNER -->
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl p-5 text-white shadow-md flex items-center justify-between">
+        <div class="space-y-1">
+          <h3 class="font-bold text-base flex items-center gap-2">
+            <i data-lucide="shield-alert" class="w-5 h-5"></i> Indikator Dana Darurat
+          </h3>
+          <p class="text-xs text-blue-100">Berapa bulan kamu bisa bertahan dengan saldo likuid saat ini tanpa pemasukan.</p>
+        </div>
+        <div class="text-right">
+          <div id="emergency-fund-months" class="text-3xl font-extrabold">0 Bulan</div>
+          <span class="text-[11px] bg-white/20 px-2 py-0.5 rounded text-white">Rekomendasi: 3 - 6 Bulan</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- SEKSI 1: BUDGETING LIMIT KATEGORI -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-base">Budgeting Limit Bulanan</h3>
+              <p class="text-xs text-slate-400">Batas maksimal pengeluaran per kategori.</p>
+            </div>
+            <i data-lucide="sliders" class="w-5 h-5 text-blue-600"></i>
+          </div>
+
+          <div id="budget-categories-list" class="space-y-3">
+          </div>
+        </div>
+
+        <!-- SEKSI 2: TARGET TABUNGAN (SAVINGS GOAL) -->
+        <div class="space-y-6">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div class="border-b border-slate-100 pb-3">
+              <h3 class="font-bold text-slate-800 text-base">Buat Target Tabungan Baru</h3>
+              <p class="text-xs text-slate-400">Set impian atau alokasi tabungan khusus.</p>
+            </div>
+
+            <form id="form-savings-goal" onsubmit="event.preventDefault();" class="space-y-3">
+              <div>
+                <input id="goal-name" type="text" placeholder="Nama: DP Rumah / Liburan / Laptop Baru" required class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <input id="goal-target" type="number" placeholder="Target Nominal (Rp)" required class="w-full border border-slate-300 rounded-lg p-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <input id="goal-date" type="date" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div>
+                <select id="goal-account" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                  <option value="">-- Memuat Akun Rekening... --</option>
+                </select>
+              </div>
+
+              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg text-xs shadow-md transition-all flex items-center justify-center space-x-1">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Simpan Target Tabungan</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+              <i data-lucide="piggy-bank" class="w-5 h-5 text-emerald-600"></i>
+              <h3 class="font-bold text-slate-800 text-base">Progress Target Tabungan</h3>
+            </div>
+            <div id="savings-goals-list" class="space-y-3"></div>
+          </div>
+        </div>
+
       </div>
     </section>
 
